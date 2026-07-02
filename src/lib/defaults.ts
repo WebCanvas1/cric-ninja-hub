@@ -98,17 +98,17 @@ export const DEFAULT_PRODUCTS: Product[] = [
 ];
 
 export const DEFAULT_CONTENT: SiteContent = {
-  hero: {
-    title: "Strike Like a Ninja.",
-    subtitle: "Hand-crafted premium cricket bats engineered for champions.",
-    tagline: "Precision willow. Explosive power. Zero compromise.",
-    image: "",
-  },
-  about: {
-    title: "The CRIC NINJA Craft",
-    body: "Every CRIC NINJA blade is shaped by master craftsmen with decades of experience. We source the finest English and Kashmir willow, hand-press each cleft, and finish every bat to tournament-grade precision. From club cricketers to first-class players — our bats are trusted where it matters most.",
-    image: "",
-  },
+ hero: {
+  title: "Strike Like a Ninja.",
+  subtitle: "Hand-crafted premium cricket bats engineered for champions.",
+  tagline: "Precision willow. Explosive power. Zero compromise.",
+  image: "",
+},
+about: {
+  title: "The CRIC NINJA Craft",
+  body: "Every CRIC NINJA blade is shaped by master craftsmen with decades of experience. We source the finest English and Kashmir willow, hand-press each cleft, and finish every bat to tournament-grade precision. From club cricketers to first-class players — our bats are trusted where it matters most.",
+  image: "",
+},
   contact: {
     email: "hello@cricninja.com",
     phone: "+91 98765 43210",
