@@ -15,8 +15,17 @@ export type Product = {
 };
 
 export type SiteContent = {
-  hero: { title: string; subtitle: string; tagline: string };
-  about: { title: string; body: string };
+  hero: {
+    title: string;
+    subtitle: string;
+    tagline: string;
+    image: string;
+  };
+  about: {
+    title: string;
+    body: string;
+    image: string;
+  };
   contact: { email: string; phone: string; address: string };
   social: { instagram: string; facebook: string; youtube: string; twitter: string };
   gallery: string[];
