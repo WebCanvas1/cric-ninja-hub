@@ -245,6 +245,24 @@ function ProductEditor({ product, onSave, onCancel }: { product: Product; onSave
 function HomepageTab() {
   const [content, setContent] = useContent();
   const [draft, setDraft] = useState(content);
+
+  async function onHeroImage(files: FileList | null) {
+    if (!files?.[0]) return;
+    const image = await fileToBase64(files[0]);
+    setDraft({
+      ...draft,
+      hero: { ...draft.hero, image },
+    });
+    toast.success("Hero image added");
+  }
+
+  function removeHeroImage() {
+    setDraft({
+      ...draft,
+      hero: { ...draft.hero, image: "" },
+    });
+  }
+
   return (
     <div className="rounded-md border border-border bg-card p-6">
       <h2 className="display mb-5 text-2xl font-bold uppercase tracking-wider">Homepage Hero</h2>
@@ -252,6 +270,30 @@ function HomepageTab() {
         <div><label className={labelCls}>Hero title</label><input className={inputCls} value={draft.hero.title} onChange={(e) => setDraft({ ...draft, hero: { ...draft.hero, title: e.target.value } })} /></div>
         <div><label className={labelCls}>Subtitle</label><input className={inputCls} value={draft.hero.subtitle} onChange={(e) => setDraft({ ...draft, hero: { ...draft.hero, subtitle: e.target.value } })} /></div>
         <div><label className={labelCls}>Tagline</label><input className={inputCls} value={draft.hero.tagline} onChange={(e) => setDraft({ ...draft, hero: { ...draft.hero, tagline: e.target.value } })} /></div>
+
+        <div>
+          <label className={labelCls}>Hero Image</label>
+          {draft.hero.image ? (
+            <div className="group relative mb-3 h-48 overflow-hidden rounded-sm border border-border bg-background">
+              <img src={draft.hero.image} alt="Hero preview" className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={removeHeroImage}
+                className="absolute right-2 top-2 rounded-full bg-black/70 p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="mb-3 rounded-sm border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+              No hero image uploaded yet.
+            </div>
+          )}
+          <label className={btnGhost + " cursor-pointer"}>
+            <input type="file" accept="image/*" className="hidden" onChange={(e) => onHeroImage(e.target.files)} />
+            <Upload className="h-4 w-4" /> Upload Hero Image
+          </label>
+        </div>
 
         <h3 className="display mt-4 text-lg font-bold uppercase tracking-wider">Why Choose Us</h3>
         {draft.whyChooseUs.map((f, i) => (
@@ -268,15 +310,92 @@ function HomepageTab() {
 
 function AboutTab() {
   const [content, setContent] = useContent();
-  const [draft, setDraft] = useState(content.about);
+  const [draft, setDraft] = useState(content);
+
+  async function onAboutImage(files: FileList | null) {
+    if (!files?.[0]) return;
+    const image = await fileToBase64(files[0]);
+    setDraft({
+      ...draft,
+      about: { ...draft.about, image },
+    });
+    toast.success("About image added");
+  }
+
+  function removeAboutImage() {
+    setDraft({
+      ...draft,
+      about: { ...draft.about, image: "" },
+    });
+  }
+
   return (
     <div className="rounded-md border border-border bg-card p-6">
       <h2 className="display mb-5 text-2xl font-bold uppercase tracking-wider">About Section</h2>
       <div className="grid gap-4">
-        <div><label className={labelCls}>Title</label><input className={inputCls} value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} /></div>
-        <div><label className={labelCls}>Body</label><textarea rows={8} className={`${inputCls} resize-none`} value={draft.body} onChange={(e) => setDraft({ ...draft, body: e.target.value })} /></div>
+        <div>
+          <label className={labelCls}>Title</label>
+          <input
+            className={inputCls}
+            value={draft.about.title}
+            onChange={(e) =>
+              setDraft({
+                ...draft,
+                about: { ...draft.about, title: e.target.value },
+              })
+            }
+          />
+        </div>
+
+        <div>
+          <label className={labelCls}>Body</label>
+          <textarea
+            rows={8}
+            className={`${inputCls} resize-none`}
+            value={draft.about.body}
+            onChange={(e) =>
+              setDraft({
+                ...draft,
+                about: { ...draft.about, body: e.target.value },
+              })
+            }
+          />
+        </div>
+
+        <div>
+          <label className={labelCls}>About Image</label>
+          {draft.about.image ? (
+            <div className="group relative mb-3 h-48 overflow-hidden rounded-sm border border-border bg-background">
+              <img src={draft.about.image} alt="About preview" className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={removeAboutImage}
+                className="absolute right-2 top-2 rounded-full bg-black/70 p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="mb-3 rounded-sm border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+              No about image uploaded yet.
+            </div>
+          )}
+          <label className={btnGhost + " cursor-pointer"}>
+            <input type="file" accept="image/*" className="hidden" onChange={(e) => onAboutImage(e.target.files)} />
+            <Upload className="h-4 w-4" /> Upload About Image
+          </label>
+        </div>
       </div>
-      <button className={`${btnPrimary} mt-5`} onClick={() => { setContent({ ...content, about: draft }); toast.success("About updated"); }}><Save className="h-4 w-4" /> Save</button>
+
+      <button
+        className={`${btnPrimary} mt-5`}
+        onClick={() => {
+          setContent(draft);
+          toast.success("About updated");
+        }}
+      >
+        <Save className="h-4 w-4" /> Save
+      </button>
     </div>
   );
 }
@@ -315,31 +434,44 @@ function SocialTab() {
 
 function GalleryTab() {
   const [content, setContent] = useContent();
+  const [draft, setDraft] = useState(content);
 
   async function addFiles(files: FileList | null) {
     if (!files) return;
     const arr = await Promise.all(Array.from(files).map(fileToBase64));
-    setContent({ ...content, gallery: [...content.gallery, ...arr] });
-    toast.success(`${arr.length} image(s) added`);
+    setDraft({ ...draft, gallery: [...draft.gallery, ...arr] });
+    toast.success(`${arr.length} image(s) added. Click Save Gallery to publish.`);
   }
+
   function remove(i: number) {
-    setContent({ ...content, gallery: content.gallery.filter((_, idx) => idx !== i) });
+    setDraft({ ...draft, gallery: draft.gallery.filter((_, idx) => idx !== i) });
+  }
+
+  function saveGallery() {
+    setContent(draft);
+    toast.success("Gallery saved");
   }
 
   return (
     <div className="rounded-md border border-border bg-card p-6">
-      <div className="mb-5 flex items-center justify-between">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <h2 className="display text-2xl font-bold uppercase tracking-wider">Website Gallery</h2>
-        <label className={btnPrimary + " cursor-pointer"}>
-          <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => addFiles(e.target.files)} />
-          <Upload className="h-4 w-4" /> Upload
-        </label>
+        <div className="flex flex-wrap gap-2">
+          <label className={btnGhost + " cursor-pointer"}>
+            <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => addFiles(e.target.files)} />
+            <Upload className="h-4 w-4" /> Upload
+          </label>
+          <button onClick={saveGallery} className={btnPrimary}>
+            <Save className="h-4 w-4" /> Save Gallery
+          </button>
+        </div>
       </div>
-      {content.gallery.length === 0 ? (
+
+      {draft.gallery.length === 0 ? (
         <div className="rounded-sm border border-dashed border-border p-10 text-center text-sm text-muted-foreground">No gallery images yet.</div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-          {content.gallery.map((src, i) => (
+          {draft.gallery.map((src, i) => (
             <div key={i} className="group relative aspect-square overflow-hidden rounded-sm border border-border">
               <img src={src} alt="" className="h-full w-full object-cover" />
               <button onClick={() => remove(i)} className="absolute right-1 top-1 rounded-full bg-black/70 p-1 text-white opacity-0 group-hover:opacity-100"><X className="h-3 w-3" /></button>
