@@ -18,6 +18,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as ApiCheckoutRouteImport } from './routes/api/checkout'
+import { Route as ApiDataSectionRouteImport } from './routes/api/data.$section'
 
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
@@ -64,6 +65,11 @@ const ApiCheckoutRoute = ApiCheckoutRouteImport.update({
   path: '/api/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDataSectionRoute = ApiDataSectionRouteImport.update({
+  id: '/api/data/$section',
+  path: '/api/data/$section',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRoute
   '/api/checkout': typeof ApiCheckoutRoute
   '/product/$id': typeof ProductIdRoute
+  '/api/data/$section': typeof ApiDataSectionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/api/checkout': typeof ApiCheckoutRoute
   '/product/$id': typeof ProductIdRoute
+  '/api/data/$section': typeof ApiDataSectionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/shop': typeof ShopRoute
   '/api/checkout': typeof ApiCheckoutRoute
   '/product/$id': typeof ProductIdRoute
+  '/api/data/$section': typeof ApiDataSectionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/api/checkout'
     | '/product/$id'
+    | '/api/data/$section'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/api/checkout'
     | '/product/$id'
+    | '/api/data/$section'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/api/checkout'
     | '/product/$id'
+    | '/api/data/$section'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +157,7 @@ export interface RootRouteChildren {
   ShopRoute: typeof ShopRoute
   ApiCheckoutRoute: typeof ApiCheckoutRoute
   ProductIdRoute: typeof ProductIdRoute
+  ApiDataSectionRoute: typeof ApiDataSectionRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/data/$section': {
+      id: '/api/data/$section'
+      path: '/api/data/$section'
+      fullPath: '/api/data/$section'
+      preLoaderRoute: typeof ApiDataSectionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -225,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopRoute: ShopRoute,
   ApiCheckoutRoute: ApiCheckoutRoute,
   ProductIdRoute: ProductIdRoute,
+  ApiDataSectionRoute: ApiDataSectionRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
