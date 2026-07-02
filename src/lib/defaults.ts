@@ -102,10 +102,12 @@ export const DEFAULT_CONTENT: SiteContent = {
     title: "Strike Like a Ninja.",
     subtitle: "Hand-crafted premium cricket bats engineered for champions.",
     tagline: "Precision willow. Explosive power. Zero compromise.",
+    image: "",
   },
   about: {
     title: "The CRIC NINJA Craft",
     body: "Every CRIC NINJA blade is shaped by master craftsmen with decades of experience. We source the finest English and Kashmir willow, hand-press each cleft, and finish every bat to tournament-grade precision. From club cricketers to first-class players — our bats are trusted where it matters most.",
+    image: "",
   },
   contact: {
     email: "hello@cricninja.com",
@@ -120,14 +122,41 @@ export const DEFAULT_CONTENT: SiteContent = {
   },
   gallery: [],
   testimonials: [
-    { name: "Rohan Sharma", role: "Ranji Trophy Player", quote: "The Shinobi Pro is a weapon. Massive middle, insane pickup — best blade I've owned.", rating: 5 },
-    { name: "Aditya Verma", role: "Club Captain, Mumbai", quote: "Craftsmanship is next level. My Katana Elite has been through two seasons and still pings.", rating: 5 },
-    { name: "Sameer Khan", role: "T20 League Batter", quote: "CRIC NINJA bats hit different. Quality you can feel from the first knock-in.", rating: 5 },
+    {
+      name: "Rohan Sharma",
+      role: "Ranji Trophy Player",
+      quote: "The Shinobi Pro is a weapon. Massive middle, insane pickup — best blade I've owned.",
+      rating: 5,
+    },
+    {
+      name: "Aditya Verma",
+      role: "Club Captain, Mumbai",
+      quote: "Craftsmanship is next level. My Katana Elite has been through two seasons and still pings.",
+      rating: 5,
+    },
+    {
+      name: "Sameer Khan",
+      role: "T20 League Batter",
+      quote: "CRIC NINJA bats hit different. Quality you can feel from the first knock-in.",
+      rating: 5,
+    },
   ],
   whyChooseUs: [
-    { title: "Hand-Crafted", body: "Every blade shaped by master craftsmen — no shortcuts, no machines finishing the profile." },
-    { title: "Premium Willow", body: "Only Grade 1–3 English and premium Kashmir willow, cleft by cleft selected." },
-    { title: "Tournament Ready", body: "Pre-knocked, oiled, and match-prepped so you can score from day one." },
-    { title: "Lifetime Support", body: "Free repairs on all players-grade bats for the first year. We stand behind every blade." },
+    {
+      title: "Hand-Crafted",
+      body: "Every blade shaped by master craftsmen — no shortcuts, no machines finishing the profile.",
+    },
+    {
+      title: "Premium Willow",
+      body: "Only Grade 1–3 English and premium Kashmir willow, cleft by cleft selected.",
+    },
+    {
+      title: "Tournament Ready",
+      body: "Pre-knocked, oiled, and match-prepped so you can score from day one.",
+    },
+    {
+      title: "Lifetime Support",
+      body: "Free repairs on all players-grade bats for the first year. We stand behind every blade.",
+    },
   ],
 };
