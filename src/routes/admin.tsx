@@ -5,12 +5,13 @@ import {
   useAdminAuth,
   useProducts,
   useContent,
-  fileToBase64,
+  optimizeImage,
+  IMAGE_PRESETS,
   formatPrice,
   type Product,
   type SiteContent,
 } from "@/lib/store";
-import { LogOut, Plus, Trash2, Save, Upload, X, Lock, Package, Image as ImageIcon, Info, Phone, Share2, LayoutDashboard } from "lucide-react";
+import { LogOut, Plus, Trash2, Save, Upload, X, Lock, Package, Image as ImageIcon, Info, Phone, Share2, LayoutDashboard, Loader2, ArrowLeft, ArrowRight, Replace } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
