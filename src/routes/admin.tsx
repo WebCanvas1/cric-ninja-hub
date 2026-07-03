@@ -184,12 +184,51 @@ function ProductsTab() {
 
 function ProductEditor({ product, onSave, onCancel }: { product: Product; onSave: (p: Product) => void; onCancel: () => void }) {
   const [p, setP] = useState<Product>(product);
+  const [uploading, setUploading] = useState(false);
+  const [replaceIdx, setReplaceIdx] = useState<number | null>(null);
   const set = <K extends keyof Product>(k: K, v: Product[K]) => setP({ ...p, [k]: v });
 
   async function onFiles(files: FileList | null) {
-    if (!files) return;
-    const arr = await Promise.all(Array.from(files).map(fileToBase64));
-    set("images", [...p.images, ...arr]);
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const preset = IMAGE_PRESETS.product;
+      const arr = await Promise.all(
+        Array.from(files).map((f) => optimizeImage(f, preset.w, preset.h, preset.q)),
+      );
+      set("images", [...p.images, ...arr]);
+      toast.success(`${arr.length} image(s) added`);
+    } catch {
+      toast.error("Failed to process image(s)");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function onReplace(files: FileList | null, idx: number) {
+    if (!files?.[0]) return;
+    setUploading(true);
+    try {
+      const preset = IMAGE_PRESETS.product;
+      const src = await optimizeImage(files[0], preset.w, preset.h, preset.q);
+      const next = [...p.images];
+      next[idx] = src;
+      set("images", next);
+      toast.success("Image replaced");
+    } catch {
+      toast.error("Failed to replace image");
+    } finally {
+      setUploading(false);
+      setReplaceIdx(null);
+    }
+  }
+
+  function move(idx: number, dir: -1 | 1) {
+    const next = [...p.images];
+    const target = idx + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[idx], next[target]] = [next[target], next[idx]];
+    set("images", next);
   }
 
   return (
@@ -220,20 +259,54 @@ function ProductEditor({ product, onSave, onCancel }: { product: Product; onSave
 
       {/* Images */}
       <div className="mt-6">
-        <label className={labelCls}>Product Images (Base64)</label>
+        <div className="mb-2 flex items-center justify-between">
+          <label className={labelCls}>Product Images ({p.images.length}) — 1000×1000 recommended</label>
+          {uploading && <span className="inline-flex items-center gap-1 text-xs text-muted-foreground"><Loader2 className="h-3 w-3 animate-spin" /> Optimizing…</span>}
+        </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {p.images.map((src, i) => (
             <div key={i} className="group relative aspect-square overflow-hidden rounded-sm border border-border">
-              <img src={src} alt="" className="h-full w-full object-cover" />
-              <button
-                onClick={() => set("images", p.images.filter((_, idx) => idx !== i))}
-                className="absolute right-1 top-1 rounded-full bg-black/70 p-1 text-white opacity-0 group-hover:opacity-100"
-              ><X className="h-3 w-3" /></button>
+              <img src={src} alt="" loading="lazy" className="h-full w-full object-cover" />
+              {i === 0 && (
+                <span className="absolute left-1 top-1 rounded-sm bg-primary px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-primary-foreground">Main</span>
+              )}
+              <div className="absolute inset-x-1 bottom-1 flex justify-between gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <button
+                  type="button"
+                  disabled={i === 0}
+                  onClick={() => move(i, -1)}
+                  className="rounded-sm bg-black/70 p-1 text-white disabled:opacity-30"
+                  title="Move left"
+                ><ArrowLeft className="h-3 w-3" /></button>
+                <button
+                  type="button"
+                  disabled={i === p.images.length - 1}
+                  onClick={() => move(i, 1)}
+                  className="rounded-sm bg-black/70 p-1 text-white disabled:opacity-30"
+                  title="Move right"
+                ><ArrowRight className="h-3 w-3" /></button>
+                <label className="cursor-pointer rounded-sm bg-black/70 p-1 text-white" title="Replace">
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => onReplace(e.target.files, i)} />
+                  <Replace className="h-3 w-3" />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => set("images", p.images.filter((_, idx) => idx !== i))}
+                  className="rounded-sm bg-black/70 p-1 text-white"
+                  title="Remove"
+                ><X className="h-3 w-3" /></button>
+              </div>
+              {replaceIdx === i && (
+                <div className="absolute inset-0 grid place-items-center bg-black/60 text-white"><Loader2 className="h-4 w-4 animate-spin" /></div>
+              )}
             </div>
           ))}
           <label className="flex aspect-square cursor-pointer items-center justify-center rounded-sm border border-dashed border-border bg-background text-xs uppercase tracking-widest text-muted-foreground hover:border-primary hover:text-primary">
             <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => onFiles(e.target.files)} />
-            <div className="flex flex-col items-center gap-1"><Upload className="h-4 w-4" /> Upload</div>
+            <div className="flex flex-col items-center gap-1">
+              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+              {uploading ? "Uploading" : "Upload"}
+            </div>
           </label>
         </div>
       </div>
