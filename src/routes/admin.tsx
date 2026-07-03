@@ -469,7 +469,7 @@ function AboutTab() {
           )}
           <label className={btnGhost + " cursor-pointer"}>
             <input type="file" accept="image/*" className="hidden" onChange={(e) => onAboutImage(e.target.files)} />
-            <Upload className="h-4 w-4" /> Upload About Image
+            {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Optimizing…</> : <><Upload className="h-4 w-4" /> {draft.about.image ? "Replace About Image" : "Upload About Image"} (1200×800)</>}
           </label>
         </div>
       </div>
@@ -522,12 +522,23 @@ function SocialTab() {
 function GalleryTab() {
   const [content, setContent] = useContent();
   const [draft, setDraft] = useState(content);
+  const [busy, setBusy] = useState(false);
 
   async function addFiles(files: FileList | null) {
-    if (!files) return;
-    const arr = await Promise.all(Array.from(files).map(fileToBase64));
-    setDraft({ ...draft, gallery: [...draft.gallery, ...arr] });
-    toast.success(`${arr.length} image(s) added. Click Save Gallery to publish.`);
+    if (!files || files.length === 0) return;
+    setBusy(true);
+    try {
+      const preset = IMAGE_PRESETS.gallery;
+      const arr = await Promise.all(
+        Array.from(files).map((f) => optimizeImage(f, preset.w, preset.h, preset.q)),
+      );
+      setDraft({ ...draft, gallery: [...draft.gallery, ...arr] });
+      toast.success(`${arr.length} image(s) added. Click Save Gallery to publish.`);
+    } catch {
+      toast.error("Failed to process image(s)");
+    } finally {
+      setBusy(false);
+    }
   }
 
   function remove(i: number) {
@@ -546,7 +557,7 @@ function GalleryTab() {
         <div className="flex flex-wrap gap-2">
           <label className={btnGhost + " cursor-pointer"}>
             <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => addFiles(e.target.files)} />
-            <Upload className="h-4 w-4" /> Upload
+            {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Optimizing…</> : <><Upload className="h-4 w-4" /> Upload</>}
           </label>
           <button onClick={saveGallery} className={btnPrimary}>
             <Save className="h-4 w-4" /> Save Gallery
@@ -560,7 +571,7 @@ function GalleryTab() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           {draft.gallery.map((src, i) => (
             <div key={i} className="group relative aspect-square overflow-hidden rounded-sm border border-border">
-              <img src={src} alt="" className="h-full w-full object-cover" />
+              <img src={src} alt="" loading="lazy" className="h-full w-full object-cover" />
               <button onClick={() => remove(i)} className="absolute right-1 top-1 rounded-full bg-black/70 p-1 text-white opacity-0 group-hover:opacity-100"><X className="h-3 w-3" /></button>
             </div>
           ))}
