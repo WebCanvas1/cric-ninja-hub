@@ -320,15 +320,21 @@ function ProductEditor({ product, onSave, onCancel }: { product: Product; onSave
 function HomepageTab() {
   const [content, setContent] = useContent();
   const [draft, setDraft] = useState(content);
+  const [busy, setBusy] = useState(false);
 
   async function onHeroImage(files: FileList | null) {
     if (!files?.[0]) return;
-    const image = await fileToBase64(files[0]);
-    setDraft({
-      ...draft,
-      hero: { ...draft.hero, image },
-    });
-    toast.success("Hero image added");
+    setBusy(true);
+    try {
+      const preset = IMAGE_PRESETS.hero;
+      const image = await optimizeImage(files[0], preset.w, preset.h, preset.q);
+      setDraft({ ...draft, hero: { ...draft.hero, image } });
+      toast.success("Hero image ready — click Save to publish");
+    } catch {
+      toast.error("Failed to process hero image");
+    } finally {
+      setBusy(false);
+    }
   }
 
   function removeHeroImage() {
@@ -366,7 +372,7 @@ function HomepageTab() {
           )}
           <label className={btnGhost + " cursor-pointer"}>
             <input type="file" accept="image/*" className="hidden" onChange={(e) => onHeroImage(e.target.files)} />
-            <Upload className="h-4 w-4" /> Upload Hero Image
+            {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Optimizing…</> : <><Upload className="h-4 w-4" /> {draft.hero.image ? "Replace Hero Image" : "Upload Hero Image"} (1600×900)</>}
           </label>
         </div>
 
@@ -386,15 +392,21 @@ function HomepageTab() {
 function AboutTab() {
   const [content, setContent] = useContent();
   const [draft, setDraft] = useState(content);
+  const [busy, setBusy] = useState(false);
 
   async function onAboutImage(files: FileList | null) {
     if (!files?.[0]) return;
-    const image = await fileToBase64(files[0]);
-    setDraft({
-      ...draft,
-      about: { ...draft.about, image },
-    });
-    toast.success("About image added");
+    setBusy(true);
+    try {
+      const preset = IMAGE_PRESETS.about;
+      const image = await optimizeImage(files[0], preset.w, preset.h, preset.q);
+      setDraft({ ...draft, about: { ...draft.about, image } });
+      toast.success("About image ready — click Save to publish");
+    } catch {
+      toast.error("Failed to process about image");
+    } finally {
+      setBusy(false);
+    }
   }
 
   function removeAboutImage() {
