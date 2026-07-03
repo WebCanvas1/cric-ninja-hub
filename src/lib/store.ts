@@ -208,6 +208,40 @@ export async function fileToBase64(file: File): Promise<string> {
   });
 }
 
+// Resize + compress an uploaded image and return an optimized base64 data URL.
+// Keeps KV payloads small while maintaining visual quality.
+export async function optimizeImage(
+  file: File,
+  maxW: number,
+  maxH: number,
+  quality = 0.82,
+): Promise<string> {
+  if (typeof window === "undefined") return fileToBase64(file);
+  try {
+    const bitmap = await createImageBitmap(file);
+    const ratio = Math.min(maxW / bitmap.width, maxH / bitmap.height, 1);
+    const w = Math.max(1, Math.round(bitmap.width * ratio));
+    const h = Math.max(1, Math.round(bitmap.height * ratio));
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return fileToBase64(file);
+    ctx.drawImage(bitmap, 0, 0, w, h);
+    bitmap.close?.();
+    return canvas.toDataURL("image/jpeg", quality);
+  } catch {
+    return fileToBase64(file);
+  }
+}
+
+export const IMAGE_PRESETS = {
+  hero: { w: 1600, h: 900, q: 0.82 },
+  about: { w: 1200, h: 800, q: 0.82 },
+  product: { w: 1000, h: 1000, q: 0.82 },
+  gallery: { w: 1200, h: 1200, q: 0.8 },
+} as const;
+
 export function productImage(p: Product): string {
   return p.images[0] || FALLBACK_BAT_IMG;
 }
