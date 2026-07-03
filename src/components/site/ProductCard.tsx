@@ -14,6 +14,7 @@ export function ProductCard({ product }: { product: Product }) {
           <img
             src={productImage(product)}
             alt={product.name}
+            loading="lazy"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           {product.featured && (
