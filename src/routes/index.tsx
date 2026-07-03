@@ -47,7 +47,7 @@ function Index() {
           <div className="relative">
             <div className="absolute -inset-6 rounded-full bg-primary/20 blur-3xl" />
             <div className="relative aspect-square overflow-hidden rounded-full border-2 border-primary/30 shadow-red">
-              <img src={LOGO_URL} alt="CRIC NINJA" className="h-full w-full object-cover" />
+              <img src={content.hero.image || LOGO_URL} alt="CRIC NINJA" className="h-full w-full object-cover" />
             </div>
           </div>
         </div>
@@ -95,7 +95,7 @@ function Index() {
       {/* CRAFTSMANSHIP */}
       <section className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 md:grid-cols-2 md:items-center">
         <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-secondary shadow-card">
-          <img src={LOGO_URL} alt="Craftsmanship" className="h-full w-full object-cover opacity-70" />
+          <img src={content.about.image || LOGO_URL} alt="Craftsmanship" loading="lazy" className="h-full w-full object-cover opacity-70" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
           <div className="absolute bottom-6 left-6 right-6">
             <div className="text-xs font-bold uppercase tracking-widest text-primary">The Workshop</div>
