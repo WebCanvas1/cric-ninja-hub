@@ -208,6 +208,7 @@ function ProductEditor({ product, onSave, onCancel }: { product: Product; onSave
   async function onReplace(files: FileList | null, idx: number) {
     if (!files?.[0]) return;
     setUploading(true);
+    setReplaceIdx(idx);
     try {
       const preset = IMAGE_PRESETS.product;
       const src = await optimizeImage(files[0], preset.w, preset.h, preset.q);
