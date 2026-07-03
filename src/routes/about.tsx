@@ -25,7 +25,7 @@ function About() {
             <p className="mt-6 text-lg text-muted-foreground">{content.about.body}</p>
           </div>
           <div className="relative aspect-square overflow-hidden rounded-full border-2 border-primary/30 shadow-red">
-            <img src={LOGO_URL} alt="CRIC NINJA" className="h-full w-full object-cover" />
+            <img src={content.about.image || LOGO_URL} alt={content.about.title} className="h-full w-full object-cover" />
           </div>
         </div>
       </section>
