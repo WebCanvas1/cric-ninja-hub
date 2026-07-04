@@ -7,6 +7,12 @@ type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
 
+type GlobalWithCloudflareEnv = typeof globalThis & {
+  env?: unknown;
+  __env?: unknown;
+  CRIC_NINJA_KV?: unknown;
+};
+
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
 async function getServerEntry(): Promise<ServerEntry> {
@@ -16,6 +22,17 @@ async function getServerEntry(): Promise<ServerEntry> {
     );
   }
   return serverEntryPromise;
+}
+
+function exposeCloudflareEnv(env: unknown) {
+  const g = globalThis as GlobalWithCloudflareEnv;
+  g.env = env;
+  g.__env = env;
+
+  const maybeEnv = env as { CRIC_NINJA_KV?: unknown };
+  if (maybeEnv?.CRIC_NINJA_KV) {
+    g.CRIC_NINJA_KV = maybeEnv.CRIC_NINJA_KV;
+  }
 }
 
 // h3 swallows in-handler throws into a normal 500 Response with body
@@ -47,8 +64,11 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      exposeCloudflareEnv(env);
+
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
+
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
       console.error(error);
