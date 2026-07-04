@@ -4,10 +4,12 @@ import {
   useAdminAuth,
   useProducts,
   useContent,
+  useCategories,
   optimizeImage,
   IMAGE_PRESETS,
   formatPrice,
   type Product,
+  type Category,
 } from "@/lib/store";
 import { LogOut, Plus, Trash2, Save, Upload, X, Lock, Package, Image as ImageIcon, Info, Phone, Share2, LayoutDashboard, Loader2, ArrowLeft, ArrowRight, Replace } from "lucide-react";
 import { toast } from "sonner";
@@ -52,7 +54,7 @@ function AdminLogin() {
   );
 }
 
-type Tab = "products" | "homepage" | "about" | "contact" | "social" | "gallery";
+type Tab = "products" | "categories" | "homepage" | "about" | "contact" | "social" | "gallery";
 
 function AdminDashboard() {
   const auth = useAdminAuth();
@@ -60,6 +62,7 @@ function AdminDashboard() {
 
   const tabs: { id: Tab; label: string; icon: ComponentType<{ className?: string }> }[] = [
     { id: "products", label: "Products", icon: Package },
+    { id: "categories", label: "Categories", icon: Package },
     { id: "homepage", label: "Homepage", icon: LayoutDashboard },
     { id: "about", label: "About", icon: Info },
     { id: "contact", label: "Contact", icon: Phone },
@@ -97,6 +100,7 @@ function AdminDashboard() {
 
           <div>
             {tab === "products" && <ProductsTab />}
+            {tab === "categories" && <CategoriesTab />}
             {tab === "homepage" && <HomepageTab />}
             {tab === "about" && <AboutTab />}
             {tab === "contact" && <ContactTab />}
@@ -115,11 +119,11 @@ function emptyProduct(): Product {
   return {
     id: "new-" + Math.random().toString(36).slice(2, 8),
     name: "New Bat",
-    price: 9999,
+    price: 99.99,
     shortDescription: "",
     description: "",
     images: [],
-    category: "English Willow",
+    category: "english-willow",
     stock: 10,
     weight: "",
     size: "SH",
@@ -130,7 +134,12 @@ function emptyProduct(): Product {
 
 function ProductsTab() {
   const [products, setProducts] = useProducts();
+  const [categories] = useCategories();
   const [editing, setEditing] = useState<Product | null>(null);
+
+  function categoryName(categoryId: string) {
+    return categories.find((cat) => cat.id === categoryId)?.name || categoryId;
+  }
 
   async function save(p: Product) {
     const existing = products.find((x) => x.id === p.id);
@@ -172,7 +181,7 @@ function ProductsTab() {
             </div>
             <div className="min-w-0 flex-1">
               <div className="truncate font-bold">{p.name}</div>
-              <div className="text-xs text-muted-foreground">{p.category} · {formatPrice(p.price)} · Stock {p.stock}</div>
+              <div className="text-xs text-muted-foreground">{categoryName(p.category)} · {formatPrice(p.price)} · Stock {p.stock}</div>
             </div>
             <button onClick={() => setEditing(p)} className={btnGhost}>Edit</button>
             <button onClick={() => del(p.id)} className="inline-flex items-center gap-1 rounded-sm border border-border bg-card px-3 py-2.5 text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary hover:text-primary-foreground">
@@ -186,6 +195,7 @@ function ProductsTab() {
 }
 
 function ProductEditor({ product, onSave, onCancel }: { product: Product; onSave: (p: Product) => void; onCancel: () => void }) {
+  const [categories] = useCategories();
   const [p, setP] = useState<Product>(product);
   const [uploading, setUploading] = useState(false);
   const [replaceIdx, setReplaceIdx] = useState<number | null>(null);
@@ -247,8 +257,21 @@ function ProductEditor({ product, onSave, onCancel }: { product: Product; onSave
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2"><label className={labelCls}>Name</label><input className={inputCls} value={p.name} onChange={(e) => set("name", e.target.value)} /></div>
-        <div><label className={labelCls}>Category</label><input className={inputCls} value={p.category} onChange={(e) => set("category", e.target.value)} /></div>
-        <div><label className={labelCls}>Price (₹)</label><input type="number" className={inputCls} value={p.price} onChange={(e) => set("price", +e.target.value)} /></div>
+        <div>
+          <label className={labelCls}>Category</label>
+          <select
+            className={inputCls}
+            value={p.category}
+            onChange={(e) => set("category", e.target.value)}
+          >
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div><label className={labelCls}>Price (AUD)</label><input type="number" step="0.01" className={inputCls} value={p.price} onChange={(e) => set("price", +e.target.value)} /></div>
         <div><label className={labelCls}>Stock</label><input type="number" className={inputCls} value={p.stock} onChange={(e) => set("stock", +e.target.value)} /></div>
         <div><label className={labelCls}>Weight</label><input className={inputCls} value={p.weight} onChange={(e) => set("weight", e.target.value)} /></div>
         <div><label className={labelCls}>Size</label><input className={inputCls} value={p.size} onChange={(e) => set("size", e.target.value)} /></div>
@@ -313,6 +336,142 @@ function ProductEditor({ product, onSave, onCancel }: { product: Product; onSave
             </div>
           </label>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------- Categories ----------
+
+function slugifyCategory(value: string) {
+  const slug = value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return slug || "category-" + Math.random().toString(36).slice(2, 8);
+}
+
+function CategoriesTab() {
+  const [categories, setCategories] = useCategories();
+  const [products] = useProducts();
+
+  async function save(next: Category[], message = "Categories updated") {
+    try {
+      await setCategories(next);
+      toast.success(message);
+    } catch (err) {
+      console.error(err);
+      toast.error("Save failed. Please check Cloudflare KV binding.");
+    }
+  }
+
+  async function addCategory() {
+    const baseName = "New Category";
+    const baseId = slugifyCategory(baseName);
+    let id = baseId;
+    let count = 2;
+
+    while (categories.some((cat) => cat.id === id)) {
+      id = `${baseId}-${count}`;
+      count++;
+    }
+
+    await save([...categories, { id, name: baseName }], "Category added");
+  }
+
+  async function updateCategoryName(category: Category, name: string) {
+    const next = categories.map((cat) =>
+      cat.id === category.id ? { ...cat, name } : cat,
+    );
+
+    await save(next);
+  }
+
+  async function deleteCategory(category: Category) {
+    const usedCount = products.filter((product) => product.category === category.id).length;
+
+    if (usedCount > 0) {
+      toast.error("Move products out of this category before deleting it.");
+      return;
+    }
+
+    if (!confirm(`Delete category "${category.name}"?`)) return;
+
+    await save(
+      categories.filter((cat) => cat.id !== category.id),
+      "Category deleted",
+    );
+  }
+
+  function moveCategory(index: number, direction: -1 | 1) {
+    const target = index + direction;
+
+    if (target < 0 || target >= categories.length) return;
+
+    const next = [...categories];
+    [next[index], next[target]] = [next[target], next[index]];
+    void save(next, "Category order updated");
+  }
+
+  return (
+    <div className="rounded-md border border-border bg-card p-6">
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="display text-2xl font-bold uppercase tracking-wider">Categories ({categories.length})</h2>
+        <button onClick={addCategory} className={btnPrimary}>
+          <Plus className="h-4 w-4" /> Add Category
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        {categories.map((category, index) => {
+          const usedCount = products.filter((product) => product.category === category.id).length;
+
+          return (
+            <div key={category.id} className="rounded-sm border border-border bg-background p-4">
+              <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+                <div>
+                  <label className={labelCls}>Category Name</label>
+                  <input
+                    className={inputCls}
+                    value={category.name}
+                    onChange={(e) => void updateCategoryName(category, e.target.value)}
+                  />
+                  <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">
+                    ID: {category.id} · {usedCount} product(s)
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    disabled={index === 0}
+                    onClick={() => moveCategory(index, -1)}
+                    className={btnGhost + " disabled:opacity-40"}
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" /> Up
+                  </button>
+                  <button
+                    type="button"
+                    disabled={index === categories.length - 1}
+                    onClick={() => moveCategory(index, 1)}
+                    className={btnGhost + " disabled:opacity-40"}
+                  >
+                    <ArrowRight className="h-3.5 w-3.5" /> Down
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void deleteCategory(category)}
+                    className="inline-flex items-center gap-1 rounded-sm border border-border bg-card px-3 py-2.5 text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary hover:text-primary-foreground"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" /> Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
