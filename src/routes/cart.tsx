@@ -12,7 +12,7 @@ export default function CartPage() {
     .filter((l) => l.product);
 
   const subtotal = lines.reduce((n, l) => n + (l.product?.price || 0) * l.qty, 0);
-  const shipping = subtotal > 0 && subtotal < 10000 ? 299 : 0;
+  const shipping = subtotal > 0 && subtotal < 150 ? 15 : 0;
   const total = subtotal + shipping;
 
   return (
@@ -121,7 +121,7 @@ export default function CartPage() {
 
                 {shipping > 0 && (
                   <div className="rounded-sm bg-primary/10 p-2 text-xs text-primary">
-                    Add {formatPrice(10000 - subtotal)} more for free shipping
+                    Add {formatPrice(150 - subtotal)} more for free shipping
                   </div>
                 )}
 
