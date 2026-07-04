@@ -25,6 +25,9 @@ async function getServerEntry(): Promise<ServerEntry> {
 }
 
 function exposeCloudflareEnv(env: unknown) {
+  console.log("Server env keys:", env && typeof env === "object" ? Object.keys(env) : env);
+  console.log("Server CRIC_NINJA_KV:", (env as { CRIC_NINJA_KV?: unknown })?.CRIC_NINJA_KV);
+
   const g = globalThis as GlobalWithCloudflareEnv;
   g.env = env;
   g.__env = env;
