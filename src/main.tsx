@@ -1,9 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import "./index.css";
+import "./styles.css";
 
-import Layout from "./routes/__root";
+import RootLayout from "./routes/__root";
 import Home from "./routes/index";
 import Shop from "./routes/shop";
 import About from "./routes/about";
@@ -17,7 +17,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route element={<Layout />}>
+        <Route element={<RootLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/about" element={<About />} />
