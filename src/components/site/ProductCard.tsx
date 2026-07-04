@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { formatPrice, productImage, type Product, useCart } from "@/lib/store";
 import { ShoppingCart, Eye } from "lucide-react";
 import { toast } from "sonner";
