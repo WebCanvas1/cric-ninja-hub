@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./styles.css";
+import ScrollToTop from "@/components/ScrollToTop";
 
 import RootLayout from "./routes/__root";
 import Home from "./routes/index";
@@ -16,6 +17,9 @@ import ProductPage from "./routes/product.$id";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
+      {/* Automatically scroll to top on every page navigation */}
+      <ScrollToTop />
+
       <Routes>
         <Route element={<RootLayout />}>
           <Route path="/" element={<Home />} />
