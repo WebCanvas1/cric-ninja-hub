@@ -1,15 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { SiteLayout } from "@/components/site/Layout";
 import { ProductCard } from "@/components/site/ProductCard";
 import { useContent, useProducts, LOGO_URL } from "@/lib/store";
 import { ArrowRight, Award, Hammer, ShieldCheck, Star, Zap } from "lucide-react";
 
-export const Route = createFileRoute("/")({
-  component: Index,
-});
-
-function Index() {
+export default function Index() {
   const [content] = useContent();
   const [products] = useProducts();
   const featured = products.filter((p) => p.featured).slice(0, 3);
@@ -38,11 +33,6 @@ function Index() {
                 View Collection
               </Link>
             </div>
-            <div className="mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-border pt-6">
-              <div><div className="display text-2xl font-bold text-primary">10K+</div><div className="text-[10px] uppercase tracking-widest text-muted-foreground">Batters</div></div>
-              <div><div className="display text-2xl font-bold text-primary">15Y</div><div className="text-[10px] uppercase tracking-widest text-muted-foreground">Craft</div></div>
-              <div><div className="display text-2xl font-bold text-primary">4.9★</div><div className="text-[10px] uppercase tracking-widest text-muted-foreground">Rated</div></div>
-            </div>
           </div>
           <div className="relative">
             <div className="absolute -inset-6 rounded-full bg-primary/20 blur-3xl" />
@@ -53,7 +43,6 @@ function Index() {
         </div>
       </section>
 
-      {/* FEATURED BATS */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
         <div className="mb-10 flex items-end justify-between">
           <div>
@@ -67,7 +56,6 @@ function Index() {
         </div>
       </section>
 
-      {/* WHY CHOOSE US */}
       <section className="border-y border-border bg-card">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
           <div className="mb-12 text-center">
@@ -92,7 +80,6 @@ function Index() {
         </div>
       </section>
 
-      {/* CRAFTSMANSHIP */}
       <section className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 md:grid-cols-2 md:items-center">
         <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-secondary shadow-card">
           <img src={content.about.image || LOGO_URL} alt="Craftsmanship" loading="lazy" className="h-full w-full object-cover opacity-70" />
@@ -106,14 +93,9 @@ function Index() {
           <div className="text-xs font-bold uppercase tracking-[0.3em] text-primary">Craftsmanship</div>
           <h2 className="display mt-2 text-4xl font-bold uppercase leading-tight tracking-wider sm:text-5xl">{content.about.title}</h2>
           <p className="mt-6 text-lg text-muted-foreground">{content.about.body}</p>
-          <div className="mt-8 grid grid-cols-2 gap-4 border-t border-border pt-6">
-            <div><div className="display text-3xl font-bold text-primary">100%</div><div className="text-[11px] uppercase tracking-widest text-muted-foreground">Hand-Pressed</div></div>
-            <div><div className="display text-3xl font-bold text-primary">Grade 1</div><div className="text-[11px] uppercase tracking-widest text-muted-foreground">English Willow</div></div>
-          </div>
         </div>
       </section>
 
-      {/* GALLERY */}
       {content.gallery.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
           <div className="mb-10 text-center">
@@ -130,7 +112,6 @@ function Index() {
         </section>
       )}
 
-      {/* TESTIMONIALS */}
       <section className="border-t border-border bg-card">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
           <div className="mb-12 text-center">
@@ -154,7 +135,6 @@ function Index() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
         <div className="relative overflow-hidden rounded-md border border-primary/40 bg-gradient-to-br from-card via-card to-primary/20 p-10 text-center shadow-red sm:p-16">
           <h2 className="display text-4xl font-bold uppercase tracking-wider sm:text-5xl">Ready to <span className="text-gradient-red">Strike</span>?</h2>
