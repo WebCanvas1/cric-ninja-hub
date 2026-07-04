@@ -1,10 +1,9 @@
 import { defineEventHandler, getRouterParam, readBody } from "h3";
+import { env } from "cloudflare:workers";
 
-type Env = {
-  CRIC_NINJA_KV: {
-    get: (key: string) => Promise<string | null>;
-    put: (key: string, value: string) => Promise<void>;
-  };
+type KV = {
+  get: (key: string) => Promise<string | null>;
+  put: (key: string, value: string) => Promise<void>;
 };
 
 const DEFAULT_CONTENT = {
@@ -42,8 +41,7 @@ export default defineEventHandler(async (event) => {
     return new Response("Not found", { status: 404 });
   }
 
-  const env = event.req.runtime?.cloudflare?.env as Env | undefined;
-  const kv = env?.CRIC_NINJA_KV;
+  const kv = (env as unknown as { CRIC_NINJA_KV?: KV }).CRIC_NINJA_KV;
 
   if (!kv) {
     return new Response(
@@ -54,7 +52,6 @@ export default defineEventHandler(async (event) => {
 
   if (event.method === "GET") {
     const raw = await kv.get(section);
-
     return {
       data: raw ? JSON.parse(raw) : section === "content" ? DEFAULT_CONTENT : [],
     };
