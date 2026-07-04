@@ -80,6 +80,13 @@ export const Route = createFileRoute("/api/data/$section")({
 
         const kv = getRuntimeKV(request);
 
+console.log("KV object:", kv);
+console.log("Request env:", (request as any).env);
+console.log("Request context:", (request as any).context);
+console.log("Global env:", (globalThis as any).env);
+console.log("Global __env:", (globalThis as any).__env);
+console.log("Global KV:", (globalThis as any).CRIC_NINJA_KV);
+
         if (!kv) {
           console.error("CRIC_NINJA_KV binding not available in API route");
 
