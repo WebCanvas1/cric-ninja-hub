@@ -86,7 +86,7 @@ export default function Index() {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
           <div className="absolute bottom-6 left-6 right-6">
             <div className="text-xs font-bold uppercase tracking-widest text-primary">The Workshop</div>
-            <div className="display mt-1 text-2xl font-bold">Meerut, India — Home of the Ninja</div>
+            <div className="display mt-1 text-2xl font-bold">Melbourne, Australia — Home of CRIC NINJA</div>
           </div>
         </div>
         <div>
@@ -138,7 +138,7 @@ export default function Index() {
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
         <div className="relative overflow-hidden rounded-md border border-primary/40 bg-gradient-to-br from-card via-card to-primary/20 p-10 text-center shadow-red sm:p-16">
           <h2 className="display text-4xl font-bold uppercase tracking-wider sm:text-5xl">Ready to <span className="text-gradient-red">Strike</span>?</h2>
-          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">Find the blade that matches your game. Free knock-in, free shipping on all orders above ₹10,000.</p>
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">Find the blade that matches your game. Free knock-in, free shipping on all orders above $150.</p>
           <Link to="/shop" className="mt-8 inline-flex items-center gap-2 rounded-sm bg-primary px-8 py-4 text-sm font-bold uppercase tracking-widest text-primary-foreground hover:brightness-110">
             Explore Collection <ArrowRight className="h-4 w-4" />
           </Link>
