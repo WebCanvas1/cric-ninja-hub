@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getEvent } from "vinxi/http";
 import { kvGet, kvPut } from "@/lib/kv.server";
 import { DEFAULT_CONTENT, DEFAULT_PRODUCTS } from "@/lib/defaults";
 import type { SiteContent } from "@/lib/types";
@@ -8,25 +7,26 @@ type Section = "products" | "content" | "gallery" | "about" | "contact" | "socia
 
 const SECTIONS: Section[] = ["products", "content", "gallery", "about", "contact", "social"];
 
-function getRuntimeKV() {
-  const event = getEvent() as {
-    req?: {
-      runtime?: {
-        cloudflare?: {
-          env?: Record<string, unknown>;
-        };
-      };
-    };
-    context?: {
-      cloudflare?: {
-        env?: Record<string, unknown>;
-      };
-    };
+function getRuntimeKV(request: Request) {
+  const anyRequest = request as Request & {
+    env?: Record<string, unknown>;
+    context?: { env?: Record<string, unknown> };
+  };
+
+  const g = globalThis as {
+    process?: { env?: Record<string, unknown> };
+    CRIC_NINJA_KV?: unknown;
+    env?: Record<string, unknown>;
+    __env?: Record<string, unknown>;
   };
 
   return (
-    event?.req?.runtime?.cloudflare?.env?.CRIC_NINJA_KV ||
-    event?.context?.cloudflare?.env?.CRIC_NINJA_KV ||
+    anyRequest.env?.CRIC_NINJA_KV ||
+    anyRequest.context?.env?.CRIC_NINJA_KV ||
+    g.process?.env?.CRIC_NINJA_KV ||
+    g.CRIC_NINJA_KV ||
+    g.env?.CRIC_NINJA_KV ||
+    g.__env?.CRIC_NINJA_KV ||
     null
   );
 }
@@ -58,14 +58,14 @@ async function writeSection(section: Section, body: unknown, kv?: unknown): Prom
 export const Route = createFileRoute("/api/data/$section")({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      GET: async ({ params, request }) => {
         const section = params.section as Section;
 
         if (!SECTIONS.includes(section)) {
           return new Response("Not found", { status: 404 });
         }
 
-        const kv = getRuntimeKV();
+        const kv = getRuntimeKV(request);
         const data = await readSection(section, kv);
 
         return Response.json({ data });
@@ -78,7 +78,7 @@ export const Route = createFileRoute("/api/data/$section")({
           return new Response("Not found", { status: 404 });
         }
 
-        const kv = getRuntimeKV();
+        const kv = getRuntimeKV(request);
 
         if (!kv) {
           console.error("CRIC_NINJA_KV binding not available in API route");
