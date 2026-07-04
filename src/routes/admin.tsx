@@ -139,18 +139,28 @@ function ProductsTab() {
   const [products, setProducts] = useProducts();
   const [editing, setEditing] = useState<Product | null>(null);
 
-  function save(p: Product) {
+  async function save(p: Product) {
     const existing = products.find((x) => x.id === p.id);
     const next = existing ? products.map((x) => (x.id === p.id ? p : x)) : [p, ...products];
-    setProducts(next);
-    setEditing(null);
-    toast.success("Product saved");
+    try {
+      await setProducts(next);
+      setEditing(null);
+      toast.success("Product saved");
+    } catch (err) {
+      console.error(err);
+      toast.error("Save failed. Image was not stored permanently. Please check Cloudflare KV binding or image size.");
+    }
   }
 
-  function del(id: string) {
+  async function del(id: string) {
     if (!confirm("Delete this product?")) return;
-    setProducts(products.filter((p) => p.id !== id));
-    toast.success("Product deleted");
+    try {
+      await setProducts(products.filter((p) => p.id !== id));
+      toast.success("Product deleted");
+    } catch (err) {
+      console.error(err);
+      toast.error("Delete failed. Please check Cloudflare KV binding.");
+    }
   }
 
   if (editing) return <ProductEditor product={editing} onSave={save} onCancel={() => setEditing(null)} />;
