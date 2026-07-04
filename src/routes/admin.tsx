@@ -1,4 +1,3 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState, type ComponentType } from "react";
 import { SiteLayout } from "@/components/site/Layout";
 import {
@@ -9,22 +8,16 @@ import {
   IMAGE_PRESETS,
   formatPrice,
   type Product,
-  type SiteContent,
 } from "@/lib/store";
 import { LogOut, Plus, Trash2, Save, Upload, X, Lock, Package, Image as ImageIcon, Info, Phone, Share2, LayoutDashboard, Loader2, ArrowLeft, ArrowRight, Replace } from "lucide-react";
 import { toast } from "sonner";
-
-export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin — CRIC NINJA" }] }),
-  component: Admin,
-});
 
 const inputCls = "w-full rounded-sm border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
 const labelCls = "mb-1 block text-[10px] font-bold uppercase tracking-widest text-muted-foreground";
 const btnPrimary = "inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-primary-foreground hover:brightness-110";
 const btnGhost = "inline-flex items-center gap-2 rounded-sm border border-border bg-card px-4 py-2.5 text-xs font-bold uppercase tracking-widest hover:border-primary hover:text-primary";
 
-function Admin() {
+export default function Admin() {
   const auth = useAdminAuth();
   if (!auth.authed) return <AdminLogin />;
   return <AdminDashboard />;
