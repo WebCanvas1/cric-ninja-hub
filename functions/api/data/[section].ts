@@ -12,7 +12,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const raw = await context.env.CRIC_NINJA_KV.get(section);
 
   return Response.json({
-    data: raw ? JSON.parse(raw) : section === "content" ? {} : [],
+    data: raw ? JSON.parse(raw) : section === "content" ? DEFAULT_CONTENT : DEFAULT_PRODUCTS,
   });
 };
 
