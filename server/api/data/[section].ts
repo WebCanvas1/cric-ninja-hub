@@ -1,73 +1,57 @@
-import { defineEventHandler, getRouterParam, readBody } from "h3";
+import { createFileRoute } from "@tanstack/react-router";
 import { env } from "cloudflare:workers";
+import { DEFAULT_CONTENT, DEFAULT_PRODUCTS } from "@/lib/defaults";
+
+type Section = "products" | "content";
+const SECTIONS: Section[] = ["products", "content"];
 
 type KV = {
   get: (key: string) => Promise<string | null>;
   put: (key: string, value: string) => Promise<void>;
 };
 
-const DEFAULT_CONTENT = {
-  hero: {
-    title: "Strike Like a Ninja.",
-    subtitle: "Hand-crafted premium cricket bats engineered for champions.",
-    tagline: "Precision willow. Explosive power. Zero compromise.",
-    image: "",
+function getKV() {
+  return (env as unknown as { CRIC_NINJA_KV?: KV }).CRIC_NINJA_KV;
+}
+
+export const Route = createFileRoute("/api/data/$section")({
+  server: {
+    handlers: {
+      GET: async ({ params }) => {
+        const section = params.section as Section;
+        if (!SECTIONS.includes(section)) return new Response("Not found", { status: 404 });
+
+        const kv = getKV();
+        if (!kv) {
+          return Response.json({ data: section === "content" ? DEFAULT_CONTENT : DEFAULT_PRODUCTS });
+        }
+
+        const raw = await kv.get(section);
+        return Response.json({
+          data: raw ? JSON.parse(raw) : section === "content" ? DEFAULT_CONTENT : DEFAULT_PRODUCTS,
+        });
+      },
+
+      POST: async ({ params, request }) => {
+        const section = params.section as Section;
+        if (!SECTIONS.includes(section)) return new Response("Not found", { status: 404 });
+
+        const kv = getKV();
+        if (!kv) {
+          return new Response(
+            JSON.stringify({ ok: false, message: "CRIC_NINJA_KV binding not available" }),
+            { status: 500, headers: { "Content-Type": "application/json" } },
+          );
+        }
+
+        const body = await request.json().catch(() => null);
+        if (!body || typeof body !== "object" || !("data" in body)) {
+          return new Response("Bad request", { status: 400 });
+        }
+
+        await kv.put(section, JSON.stringify((body as { data: unknown }).data));
+        return Response.json({ ok: true });
+      },
+    },
   },
-  about: {
-    title: "The CRIC NINJA Craft",
-    body: "Every CRIC NINJA blade is shaped by master craftsmen with decades of experience. We source the finest English and Kashmir willow, hand-press each cleft, and finish every bat to tournament-grade precision. From club cricketers to first-class players — our bats are trusted where it matters most.",
-    image: "",
-  },
-  contact: {
-    email: "hello@cricninja.com",
-    phone: "+91 98765 43210",
-    address: "CRIC NINJA Workshop, Meerut, Uttar Pradesh, India",
-  },
-  social: {
-    instagram: "https://instagram.com/cricninja",
-    facebook: "https://facebook.com/cricninja",
-    youtube: "https://youtube.com/@cricninja",
-    twitter: "https://twitter.com/cricninja",
-  },
-  gallery: [],
-  testimonials: [],
-  whyChooseUs: [],
-};
-
-export default defineEventHandler(async (event) => {
-  const section = getRouterParam(event, "section");
-
-  if (!section || !["content", "products"].includes(section)) {
-    return new Response("Not found", { status: 404 });
-  }
-
-  const kv = (env as unknown as { CRIC_NINJA_KV?: KV }).CRIC_NINJA_KV;
-
-  if (!kv) {
-    return new Response(
-      JSON.stringify({ ok: false, message: "CRIC_NINJA_KV binding not available" }),
-      { status: 500, headers: { "Content-Type": "application/json" } },
-    );
-  }
-
-  if (event.method === "GET") {
-    const raw = await kv.get(section);
-    return {
-      data: raw ? JSON.parse(raw) : section === "content" ? DEFAULT_CONTENT : [],
-    };
-  }
-
-  if (event.method === "POST") {
-    const body = await readBody(event);
-
-    if (!body || typeof body !== "object" || !("data" in body)) {
-      return new Response("Bad request", { status: 400 });
-    }
-
-    await kv.put(section, JSON.stringify(body.data));
-
-    return { ok: true };
-  }
-
-  return new Response("Method not allowed", { status: 405 });
 });
