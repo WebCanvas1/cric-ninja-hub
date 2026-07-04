@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { useContent, LOGO_URL } from "@/lib/store";
 import { Instagram, Facebook, Youtube, Twitter, Mail, Phone, MapPin } from "lucide-react";
 
