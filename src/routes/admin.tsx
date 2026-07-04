@@ -394,7 +394,10 @@ function HomepageTab() {
           </div>
         ))}
       </div>
-      <button className={`${btnPrimary} mt-5`} onClick={() => { setContent(draft); toast.success("Homepage updated"); }}><Save className="h-4 w-4" /> Save</button>
+      <button className={`${btnPrimary} mt-5`} onClick={async () => {
+        try { await setContent(draft); toast.success("Homepage updated"); }
+        catch (err) { console.error(err); toast.error("Save failed. Image was not stored permanently. Please check Cloudflare KV binding or image size."); }
+      }}><Save className="h-4 w-4" /> Save</button>
     </div>
   );
 }
@@ -486,9 +489,9 @@ function AboutTab() {
 
       <button
         className={`${btnPrimary} mt-5`}
-        onClick={() => {
-          setContent(draft);
-          toast.success("About updated");
+        onClick={async () => {
+          try { await setContent(draft); toast.success("About updated"); }
+          catch (err) { console.error(err); toast.error("Save failed. Image was not stored permanently. Please check Cloudflare KV binding or image size."); }
         }}
       >
         <Save className="h-4 w-4" /> Save
@@ -508,7 +511,10 @@ function ContactTab() {
         <div><label className={labelCls}>Phone</label><input className={inputCls} value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} /></div>
         <div><label className={labelCls}>Address</label><input className={inputCls} value={draft.address} onChange={(e) => setDraft({ ...draft, address: e.target.value })} /></div>
       </div>
-      <button className={`${btnPrimary} mt-5`} onClick={() => { setContent({ ...content, contact: draft }); toast.success("Contact updated"); }}><Save className="h-4 w-4" /> Save</button>
+      <button className={`${btnPrimary} mt-5`} onClick={async () => {
+        try { await setContent({ ...content, contact: draft }); toast.success("Contact updated"); }
+        catch (err) { console.error(err); toast.error("Save failed. Please check Cloudflare KV binding."); }
+      }}><Save className="h-4 w-4" /> Save</button>
     </div>
   );
 }
@@ -524,7 +530,10 @@ function SocialTab() {
           <div key={k}><label className={labelCls}>{k}</label><input className={inputCls} value={draft[k]} onChange={(e) => setDraft({ ...draft, [k]: e.target.value })} /></div>
         ))}
       </div>
-      <button className={`${btnPrimary} mt-5`} onClick={() => { setContent({ ...content, social: draft }); toast.success("Socials updated"); }}><Save className="h-4 w-4" /> Save</button>
+      <button className={`${btnPrimary} mt-5`} onClick={async () => {
+        try { await setContent({ ...content, social: draft }); toast.success("Socials updated"); }
+        catch (err) { console.error(err); toast.error("Save failed. Please check Cloudflare KV binding."); }
+      }}><Save className="h-4 w-4" /> Save</button>
     </div>
   );
 }
@@ -555,9 +564,9 @@ function GalleryTab() {
     setDraft({ ...draft, gallery: draft.gallery.filter((_, idx) => idx !== i) });
   }
 
-  function saveGallery() {
-    setContent(draft);
-    toast.success("Gallery saved");
+  async function saveGallery() {
+    try { await setContent(draft); toast.success("Gallery saved"); }
+    catch (err) { console.error(err); toast.error("Save failed. Image was not stored permanently. Please check Cloudflare KV binding or image size."); }
   }
 
   return (
