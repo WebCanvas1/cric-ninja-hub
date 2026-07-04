@@ -248,10 +248,10 @@ export async function optimizeImage(
 }
 
 export const IMAGE_PRESETS = {
-  hero: { w: 1600, h: 900, q: 0.82 },
-  about: { w: 1200, h: 800, q: 0.82 },
-  product: { w: 1000, h: 1000, q: 0.82 },
-  gallery: { w: 1200, h: 1200, q: 0.8 },
+  hero: { w: 1000, h: 560, q: 0.65 },
+  about: { w: 800, h: 600, q: 0.65 },
+  product: { w: 700, h: 700, q: 0.65 },
+  gallery: { w: 800, h: 800, q: 0.65 },
 } as const;
 
 export function productImage(p: Product): string {
