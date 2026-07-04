@@ -35,7 +35,7 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
           {product.category}
         </div>
-        <Link to="/product/$id" params={{ id: product.id }}>
+        <Link to={`/product/${product.id}`}>
           <h3 className="display text-xl font-bold tracking-wide hover:text-primary">{product.name}</h3>
         </Link>
         <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{product.shortDescription}</p>
