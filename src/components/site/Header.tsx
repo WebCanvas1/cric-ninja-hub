@@ -19,10 +19,19 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-3">
-          <img src={LOGO_URL} alt="CRIC NINJA" className="h-12 w-12 rounded-full ring-2 ring-primary/40" />
+          <img
+            src={LOGO_URL}
+            alt="CRIC NINJA"
+            className="h-12 w-12 rounded-full ring-2 ring-primary/40"
+          />
+
           <div className="hidden flex-col leading-none sm:flex">
-            <span className="display text-xl font-bold tracking-widest">CRIC NINJA</span>
-            <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Premium Cricket Bats</span>
+            <span className="display text-xl font-bold tracking-widest">
+              CRIC NINJA
+            </span>
+            <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+              Premium Cricket Bats
+            </span>
           </div>
         </Link>
 
@@ -32,7 +41,6 @@ export function Header() {
               key={l.to}
               to={l.to}
               className="text-sm font-semibold uppercase tracking-wider text-foreground/80 transition-colors hover:text-primary"
-              activeProps={{ className: "text-primary" }}
             >
               {l.label}
             </Link>
@@ -46,18 +54,24 @@ export function Header() {
             aria-label="Cart"
           >
             <ShoppingCart className="h-5 w-5" />
+
             {count > 0 && (
               <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
                 {count}
               </span>
             )}
           </Link>
+
           <button
             className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-border bg-card md:hidden"
             onClick={() => setOpen((v) => !v)}
             aria-label="Menu"
           >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {open ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </button>
         </div>
       </div>
