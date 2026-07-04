@@ -3,7 +3,9 @@
   "name": "cric-ninja-hub",
   "compatibility_date": "2025-01-01",
   "compatibility_flags": ["nodejs_compat"],
-  "pages_build_output_dir": ".output/public",
+
+  "pages_build_output_dir": "dist",
+
   "kv_namespaces": [
     {
       "binding": "CRIC_NINJA_KV",
