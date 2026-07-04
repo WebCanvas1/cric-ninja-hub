@@ -1,20 +1,24 @@
 import { SiteLayout } from "@/components/site/Layout";
 import { ProductCard } from "@/components/site/ProductCard";
-import { useProducts } from "@/lib/store";
+import { useCategories, useProducts } from "@/lib/store";
 import { useMemo, useState } from "react";
 
 export default function Shop() {
   const [products] = useProducts();
-  const [category, setCategory] = useState<string>("All");
+  const [categories] = useCategories();
+  const [category, setCategory] = useState<string>("all");
   const [sort, setSort] = useState<string>("featured");
 
-  const categories = useMemo(
-    () => ["All", ...Array.from(new Set(products.map((p) => p.category)))],
-    [products],
+  const categoryOptions = useMemo(
+    () => [{ id: "all", name: "All" }, ...categories],
+    [categories],
   );
 
   const filtered = useMemo(() => {
-    let list = category === "All" ? products : products.filter((p) => p.category === category);
+    let list =
+      category === "all"
+        ? products
+        : products.filter((p) => p.category === category);
 
     if (sort === "price-asc") list = [...list].sort((a, b) => a.price - b.price);
     else if (sort === "price-desc") list = [...list].sort((a, b) => b.price - a.price);
@@ -43,17 +47,17 @@ export default function Shop() {
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap gap-2">
-            {categories.map((c) => (
+            {categoryOptions.map((c) => (
               <button
-                key={c}
-                onClick={() => setCategory(c)}
+                key={c.id}
+                onClick={() => setCategory(c.id)}
                 className={`rounded-sm border px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors ${
-                  category === c
+                  category === c.id
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border bg-card hover:border-primary hover:text-primary"
                 }`}
               >
-                {c}
+                {c.name}
               </button>
             ))}
           </div>
