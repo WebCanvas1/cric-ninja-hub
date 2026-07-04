@@ -1,7 +1,13 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { SiteLayout } from "@/components/site/Layout";
 import { ProductCard } from "@/components/site/ProductCard";
-import { formatPrice, useCart, useProducts, FALLBACK_BAT_IMG } from "@/lib/store";
+import {
+  formatPrice,
+  useCart,
+  useProducts,
+  useCategories,
+  FALLBACK_BAT_IMG,
+} from "@/lib/store";
 import { useState } from "react";
 import { ShoppingCart, Check, Truck, Shield, Zap, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -9,6 +15,7 @@ import { toast } from "sonner";
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
   const [products] = useProducts();
+  const [categories] = useCategories();
   const product = products.find((p) => p.id === id);
   const cart = useCart();
   const navigate = useNavigate();
@@ -31,25 +38,39 @@ export default function ProductPage() {
     );
   }
 
+  const categoryName =
+    categories.find((cat) => cat.id === product.category)?.name || product.category;
+
   const images = product.images.length ? product.images : [FALLBACK_BAT_IMG];
+
   const related = products
     .filter((p) => p.id !== product.id && p.category === product.category)
     .slice(0, 3);
+
   const outOfStock = product.stock <= 0;
 
   return (
     <SiteLayout>
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:py-16">
         <nav className="mb-8 text-xs uppercase tracking-widest text-muted-foreground">
-          <Link to="/" className="hover:text-primary">Home</Link> /{" "}
-          <Link to="/shop" className="hover:text-primary">Shop</Link> /{" "}
-          <span className="text-foreground">{product.name}</span>
+          <Link to="/" className="hover:text-primary">
+            Home
+          </Link>{" "}
+          /{" "}
+          <Link to="/shop" className="hover:text-primary">
+            Shop
+          </Link>{" "}
+          / <span className="text-foreground">{product.name}</span>
         </nav>
 
         <div className="grid gap-10 lg:grid-cols-2">
           <div>
-            <div className="overflow-hidden rounded-md border border-border bg-secondary aspect-[4/5]">
-              <img src={images[activeImg]} alt={product.name} className="h-full w-full object-cover" />
+            <div className="aspect-[4/5] overflow-hidden rounded-md border border-border bg-secondary">
+              <img
+                src={images[activeImg]}
+                alt={product.name}
+                className="h-full w-full object-cover"
+              />
             </div>
 
             {images.length > 1 && (
@@ -71,12 +92,17 @@ export default function ProductPage() {
 
           <div>
             <div className="text-xs font-bold uppercase tracking-[0.3em] text-primary">
-              {product.category}
+              {categoryName}
             </div>
+
             <h1 className="display mt-2 text-4xl font-bold uppercase tracking-wider sm:text-5xl">
               {product.name}
             </h1>
-            <div className="mt-4 display text-4xl font-bold">{formatPrice(product.price)}</div>
+
+            <div className="display mt-4 text-4xl font-bold">
+              {formatPrice(product.price)}
+            </div>
+
             <p className="mt-5 text-muted-foreground">{product.description}</p>
 
             <div className="mt-6 inline-flex items-center gap-2 rounded-sm border border-border px-3 py-2 text-xs font-bold uppercase tracking-widest">
@@ -84,37 +110,57 @@ export default function ProductPage() {
                 <span className="text-muted-foreground">Out of Stock</span>
               ) : (
                 <>
-                  <Check className="h-4 w-4 text-primary" /> In Stock — {product.stock} available
+                  <Check className="h-4 w-4 text-primary" /> In Stock —{" "}
+                  {product.stock} available
                 </>
               )}
             </div>
 
             <div className="mt-8 grid grid-cols-2 gap-3 rounded-md border border-border bg-card p-5 text-sm">
               <div>
-                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Weight</div>
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Weight
+                </div>
                 <div className="font-semibold">{product.weight}</div>
               </div>
+
               <div>
-                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Size</div>
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Size
+                </div>
                 <div className="font-semibold">{product.size}</div>
               </div>
+
               <div>
-                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Willow</div>
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Willow
+                </div>
                 <div className="font-semibold">{product.willowGrade}</div>
               </div>
+
               <div>
-                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Handle</div>
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Handle
+                </div>
                 <div className="font-semibold">{product.handleType}</div>
               </div>
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
               <div className="inline-flex items-center rounded-sm border border-border bg-card">
-                <button onClick={() => setQty(Math.max(1, qty - 1))} className="p-3 hover:text-primary">
+                <button
+                  onClick={() => setQty(Math.max(1, qty - 1))}
+                  className="p-3 hover:text-primary"
+                >
                   <Minus className="h-4 w-4" />
                 </button>
+
                 <span className="min-w-10 text-center font-bold">{qty}</span>
-                <button onClick={() => setQty(qty + 1)} className="p-3 hover:text-primary">
+
+                <button
+                  onClick={() => setQty(qty + 1)}
+                  className="p-3 hover:text-primary"
+                >
                   <Plus className="h-4 w-4" />
                 </button>
               </div>
@@ -145,15 +191,23 @@ export default function ProductPage() {
             <div className="mt-8 grid grid-cols-3 gap-3 border-t border-border pt-6 text-center">
               <div className="flex flex-col items-center gap-2">
                 <Truck className="h-5 w-5 text-primary" />
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Free Shipping</span>
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Free Shipping $150+
+                </span>
               </div>
+
               <div className="flex flex-col items-center gap-2">
                 <Zap className="h-5 w-5 text-primary" />
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Pre-Knocked</span>
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Pre-Knocked
+                </span>
               </div>
+
               <div className="flex flex-col items-center gap-2">
                 <Shield className="h-5 w-5 text-primary" />
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">1-Yr Support</span>
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  1-Yr Support
+                </span>
               </div>
             </div>
           </div>
@@ -164,6 +218,7 @@ export default function ProductPage() {
             <h2 className="display mb-8 text-3xl font-bold uppercase tracking-wider">
               Related <span className="text-gradient-red">Blades</span>
             </h2>
+
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((p) => (
                 <ProductCard key={p.id} product={p} />
