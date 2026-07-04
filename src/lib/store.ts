@@ -49,16 +49,28 @@ async function fetchSection<K extends StoreKey>(key: K): Promise<void> {
 }
 
 async function saveSection<K extends StoreKey>(key: K, value: StoreShape[K]): Promise<void> {
+  const previous = cache[key];
   cache[key] = value as never;
   notify();
+  let res: Response;
   try {
-    await fetch(`/api/data/${key}`, {
+    res = await fetch(`/api/data/${key}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ data: value }),
     });
-  } catch {
-    // ignore; UI already updated
+  } catch (err) {
+    cache[key] = previous;
+    notify();
+    console.error(`saveSection network error for "${key}":`, err);
+    throw new Error(`Network error while saving "${key}"`);
+  }
+  if (!res.ok) {
+    cache[key] = previous;
+    notify();
+    const text = await res.text().catch(() => "");
+    console.error(`saveSection failed for "${key}" [${res.status}]: ${text}`);
+    throw new Error(`Save failed (${res.status}): ${text || res.statusText}`);
   }
 }
 
@@ -72,7 +84,7 @@ function subscribeStore(cb: () => void) {
 function useSection<K extends StoreKey>(
   key: K,
   fallback: StoreShape[K],
-): [StoreShape[K], (v: StoreShape[K]) => void] {
+): [StoreShape[K], (v: StoreShape[K]) => Promise<void>] {
   useSyncExternalStore(
     subscribeStore,
     () => version,
@@ -82,14 +94,14 @@ function useSection<K extends StoreKey>(
     void fetchSection(key);
   }, [key]);
   const value = (loaded[key] ? cache[key] : fallback) as StoreShape[K];
-  return [value, (v) => void saveSection(key, v)];
+  return [value, (v) => saveSection(key, v)];
 }
 
-export function useProducts(): [Product[], (p: Product[]) => void] {
+export function useProducts(): [Product[], (p: Product[]) => Promise<void>] {
   return useSection("products", DEFAULT_PRODUCTS);
 }
 
-export function useContent(): [SiteContent, (c: SiteContent) => void] {
+export function useContent(): [SiteContent, (c: SiteContent) => Promise<void>] {
   return useSection("content", DEFAULT_CONTENT);
 }
 
