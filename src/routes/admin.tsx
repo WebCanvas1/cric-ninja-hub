@@ -139,18 +139,28 @@ function ProductsTab() {
   const [products, setProducts] = useProducts();
   const [editing, setEditing] = useState<Product | null>(null);
 
-  function save(p: Product) {
+  async function save(p: Product) {
     const existing = products.find((x) => x.id === p.id);
     const next = existing ? products.map((x) => (x.id === p.id ? p : x)) : [p, ...products];
-    setProducts(next);
-    setEditing(null);
-    toast.success("Product saved");
+    try {
+      await setProducts(next);
+      setEditing(null);
+      toast.success("Product saved");
+    } catch (err) {
+      console.error(err);
+      toast.error("Save failed. Image was not stored permanently. Please check Cloudflare KV binding or image size.");
+    }
   }
 
-  function del(id: string) {
+  async function del(id: string) {
     if (!confirm("Delete this product?")) return;
-    setProducts(products.filter((p) => p.id !== id));
-    toast.success("Product deleted");
+    try {
+      await setProducts(products.filter((p) => p.id !== id));
+      toast.success("Product deleted");
+    } catch (err) {
+      console.error(err);
+      toast.error("Delete failed. Please check Cloudflare KV binding.");
+    }
   }
 
   if (editing) return <ProductEditor product={editing} onSave={save} onCancel={() => setEditing(null)} />;
@@ -384,7 +394,10 @@ function HomepageTab() {
           </div>
         ))}
       </div>
-      <button className={`${btnPrimary} mt-5`} onClick={() => { setContent(draft); toast.success("Homepage updated"); }}><Save className="h-4 w-4" /> Save</button>
+      <button className={`${btnPrimary} mt-5`} onClick={async () => {
+        try { await setContent(draft); toast.success("Homepage updated"); }
+        catch (err) { console.error(err); toast.error("Save failed. Image was not stored permanently. Please check Cloudflare KV binding or image size."); }
+      }}><Save className="h-4 w-4" /> Save</button>
     </div>
   );
 }
@@ -476,9 +489,9 @@ function AboutTab() {
 
       <button
         className={`${btnPrimary} mt-5`}
-        onClick={() => {
-          setContent(draft);
-          toast.success("About updated");
+        onClick={async () => {
+          try { await setContent(draft); toast.success("About updated"); }
+          catch (err) { console.error(err); toast.error("Save failed. Image was not stored permanently. Please check Cloudflare KV binding or image size."); }
         }}
       >
         <Save className="h-4 w-4" /> Save
@@ -498,7 +511,10 @@ function ContactTab() {
         <div><label className={labelCls}>Phone</label><input className={inputCls} value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} /></div>
         <div><label className={labelCls}>Address</label><input className={inputCls} value={draft.address} onChange={(e) => setDraft({ ...draft, address: e.target.value })} /></div>
       </div>
-      <button className={`${btnPrimary} mt-5`} onClick={() => { setContent({ ...content, contact: draft }); toast.success("Contact updated"); }}><Save className="h-4 w-4" /> Save</button>
+      <button className={`${btnPrimary} mt-5`} onClick={async () => {
+        try { await setContent({ ...content, contact: draft }); toast.success("Contact updated"); }
+        catch (err) { console.error(err); toast.error("Save failed. Please check Cloudflare KV binding."); }
+      }}><Save className="h-4 w-4" /> Save</button>
     </div>
   );
 }
@@ -514,7 +530,10 @@ function SocialTab() {
           <div key={k}><label className={labelCls}>{k}</label><input className={inputCls} value={draft[k]} onChange={(e) => setDraft({ ...draft, [k]: e.target.value })} /></div>
         ))}
       </div>
-      <button className={`${btnPrimary} mt-5`} onClick={() => { setContent({ ...content, social: draft }); toast.success("Socials updated"); }}><Save className="h-4 w-4" /> Save</button>
+      <button className={`${btnPrimary} mt-5`} onClick={async () => {
+        try { await setContent({ ...content, social: draft }); toast.success("Socials updated"); }
+        catch (err) { console.error(err); toast.error("Save failed. Please check Cloudflare KV binding."); }
+      }}><Save className="h-4 w-4" /> Save</button>
     </div>
   );
 }
@@ -545,9 +564,9 @@ function GalleryTab() {
     setDraft({ ...draft, gallery: draft.gallery.filter((_, idx) => idx !== i) });
   }
 
-  function saveGallery() {
-    setContent(draft);
-    toast.success("Gallery saved");
+  async function saveGallery() {
+    try { await setContent(draft); toast.success("Gallery saved"); }
+    catch (err) { console.error(err); toast.error("Save failed. Image was not stored permanently. Please check Cloudflare KV binding or image size."); }
   }
 
   return (

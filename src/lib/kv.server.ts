@@ -6,10 +6,25 @@ type KVNamespace = {
 };
 
 export function getKV(): KVNamespace | null {
-  const env = (globalThis as { process?: { env?: Record<string, unknown> } }).process?.env;
-  const kv = env?.CRIC_NINJA_KV as KVNamespace | undefined;
-  if (!kv || typeof kv.get !== "function") return null;
-  return kv;
+  const g = globalThis as {
+    process?: { env?: Record<string, unknown> };
+    CRIC_NINJA_KV?: unknown;
+    env?: Record<string, unknown>;
+    __env?: Record<string, unknown>;
+  };
+  const candidates: unknown[] = [
+    g.process?.env?.CRIC_NINJA_KV,
+    g.CRIC_NINJA_KV,
+    g.env?.CRIC_NINJA_KV,
+    g.__env?.CRIC_NINJA_KV,
+  ];
+  for (const c of candidates) {
+    if (c && typeof (c as KVNamespace).get === "function") return c as KVNamespace;
+  }
+  console.error(
+    "CRIC_NINJA_KV binding not found. Ensure the KV namespace is bound in wrangler.jsonc / Cloudflare dashboard.",
+  );
+  return null;
 }
 
 export async function kvGet<T>(key: string, fallback: T): Promise<T> {
@@ -30,7 +45,8 @@ export async function kvPut(key: string, value: unknown): Promise<boolean> {
   try {
     await kv.put(key, JSON.stringify(value));
     return true;
-  } catch {
+  } catch (err) {
+    console.error(`kvPut error for key "${key}":`, err);
     return false;
   }
 }

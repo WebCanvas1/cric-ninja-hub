@@ -17,18 +17,12 @@ async function readSection(section: Section) {
   return content[section];
 }
 
-async function writeSection(section: Section, body: unknown) {
-  if (section === "products") {
-    await kvPut("products", body);
-    return;
-  }
-  if (section === "content") {
-    await kvPut("content", body);
-    return;
-  }
+async function writeSection(section: Section, body: unknown): Promise<boolean> {
+  if (section === "products") return kvPut("products", body);
+  if (section === "content") return kvPut("content", body);
   const content = await loadContent();
   const next = { ...content, [section]: body } as SiteContent;
-  await kvPut("content", next);
+  return kvPut("content", next);
 }
 
 export const Route = createFileRoute("/api/data/$section")({
@@ -47,7 +41,14 @@ export const Route = createFileRoute("/api/data/$section")({
         if (body === null || typeof body !== "object" || !("data" in (body as object))) {
           return new Response("Bad request", { status: 400 });
         }
-        await writeSection(section, (body as { data: unknown }).data);
+        const saved = await writeSection(section, (body as { data: unknown }).data);
+        if (!saved) {
+          console.error(`KV save failed for section: ${section}`);
+          return new Response(
+            JSON.stringify({ ok: false, message: "KV save failed" }),
+            { status: 500, headers: { "Content-Type": "application/json" } },
+          );
+        }
         return Response.json({ ok: true });
       },
     },
