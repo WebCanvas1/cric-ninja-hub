@@ -9,7 +9,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div>
           <img
-  src={content.branding.logo || LOGO_URL}
+  src={content.branding?.logo || LOGO_URL}
   alt="CRIC NINJA"
   className="mb-4 h-14 w-14 rounded-full object-cover ring-2 ring-primary/40"
 />
