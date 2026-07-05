@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
-import { LOGO_URL, useCart } from "@/lib/store";
+import { LOGO_URL, useCart, useContent } from "@/lib/store";
 import { ShoppingCart, Menu, X } from "lucide-react";
 import { useState } from "react";
 
 export function Header() {
   const { items } = useCart();
+  const [content] = useContent();
   const [open, setOpen] = useState(false);
   const count = items.reduce((n, i) => n + i.qty, 0);
 
@@ -20,10 +21,10 @@ export function Header() {
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-3">
           <img
-            src={LOGO_URL}
-            alt="CRIC NINJA"
-            className="h-12 w-12 rounded-full ring-2 ring-primary/40"
-          />
+  src={content.branding.logo || LOGO_URL}
+  alt="CRIC NINJA"
+  className="h-12 w-12 rounded-full object-cover ring-2 ring-primary/40"
+/>
 
           <div className="hidden flex-col leading-none sm:flex">
             <span className="display text-xl font-bold tracking-widest">
