@@ -54,21 +54,30 @@ function AdminLogin() {
   );
 }
 
-type Tab = "products" | "categories" | "homepage" | "about" | "contact" | "social" | "gallery";
+type Tab =
+  | "products"
+  | "categories"
+  | "branding"
+  | "homepage"
+  | "about"
+  | "contact"
+  | "social"
+  | "gallery";
 
 function AdminDashboard() {
   const auth = useAdminAuth();
   const [tab, setTab] = useState<Tab>("products");
 
-  const tabs: { id: Tab; label: string; icon: ComponentType<{ className?: string }> }[] = [
-    { id: "products", label: "Products", icon: Package },
-    { id: "categories", label: "Categories", icon: Package },
-    { id: "homepage", label: "Homepage", icon: LayoutDashboard },
-    { id: "about", label: "About", icon: Info },
-    { id: "contact", label: "Contact", icon: Phone },
-    { id: "social", label: "Social", icon: Share2 },
-    { id: "gallery", label: "Gallery", icon: ImageIcon },
-  ];
+ const tabs: { id: Tab; label: string; icon: ComponentType<{ className?: string }> }[] = [
+  { id: "products", label: "Products", icon: Package },
+  { id: "categories", label: "Categories", icon: Package },
+  { id: "branding", label: "Branding", icon: ImageIcon },
+  { id: "homepage", label: "Homepage", icon: LayoutDashboard },
+  { id: "about", label: "About", icon: Info },
+  { id: "contact", label: "Contact", icon: Phone },
+  { id: "social", label: "Social", icon: Share2 },
+  { id: "gallery", label: "Gallery", icon: ImageIcon },
+];
 
   return (
     <SiteLayout>
@@ -101,6 +110,7 @@ function AdminDashboard() {
           <div>
             {tab === "products" && <ProductsTab />}
             {tab === "categories" && <CategoriesTab />}
+            {tab === "branding" && <BrandingTab />}
             {tab === "homepage" && <HomepageTab />}
             {tab === "about" && <AboutTab />}
             {tab === "contact" && <ContactTab />}
@@ -553,6 +563,97 @@ function HomepageTab() {
     </div>
   );
 }
+
+function BrandingTab() {
+  const [content, setContent] = useContent();
+  const [draft, setDraft] = useState(content);
+  const [busy, setBusy] = useState(false);
+
+  async function onLogo(files: FileList | null) {
+    if (!files?.[0]) return;
+
+    setBusy(true);
+
+    try {
+      const preset = IMAGE_PRESETS.about;
+
+      const logo = await optimizeImage(
+        files[0],
+        preset.w,
+        preset.h,
+        preset.q,
+      );
+
+      setDraft({
+        ...draft,
+        branding: {
+          ...(draft.branding ?? {}),
+          logo,
+        },
+      });
+
+      toast.success("Logo ready. Click Save.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="rounded-md border border-border bg-card p-6">
+      <h2 className="display mb-5 text-2xl font-bold uppercase tracking-wider">
+        Website Logo
+      </h2>
+
+      {(draft.branding?.logo ?? "") ? (
+        <div className="mb-4">
+          <img
+            src={draft.branding.logo}
+            className="h-40 w-40 rounded-full border object-cover"
+          />
+        </div>
+      ) : (
+        <div className="mb-4 rounded border border-dashed p-8 text-center text-sm text-muted-foreground">
+          No logo uploaded.
+        </div>
+      )}
+
+      <label className={btnGhost + " cursor-pointer"}>
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => onLogo(e.target.files)}
+        />
+
+        {busy ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Optimizing...
+          </>
+        ) : (
+          <>
+            <Upload className="h-4 w-4" />
+            Upload Logo
+          </>
+        )}
+      </label>
+
+      <button
+        className={`${btnPrimary} mt-5`}
+        onClick={async () => {
+          await setContent(draft);
+          toast.success("Logo updated");
+        }}
+      >
+        <Save className="h-4 w-4" />
+        Save
+      </button>
+    </div>
+  );
+}
+
+
+      
 
 function AboutTab() {
   const [content, setContent] = useContent();
