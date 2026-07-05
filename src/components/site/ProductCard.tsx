@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   formatPrice,
   productImage,
@@ -12,14 +12,20 @@ import { toast } from "sonner";
 export function ProductCard({ product }: { product: Product }) {
   const cart = useCart();
   const [categories] = useCategories();
+  const navigate = useNavigate();
   const outOfStock = product.stock <= 0;
 
   const categoryName =
     categories.find((cat) => cat.id === product.category)?.name || product.category;
 
+  function openProductPage() {
+    window.scrollTo(0, 0);
+    navigate(`/product/${product.id}`);
+  }
+
   return (
     <div className="group relative overflow-hidden rounded-md border border-border bg-card shadow-card transition-all hover:-translate-y-1 hover:border-primary/60 hover:shadow-red">
-      <Link to={`/product/${product.id}`} className="block">
+      <button onClick={openProductPage} className="block w-full text-left">
         <div className="relative aspect-[4/5] overflow-hidden bg-secondary">
           <img
             src={productImage(product)}
@@ -40,18 +46,18 @@ export function ProductCard({ product }: { product: Product }) {
             {outOfStock ? "Sold Out" : "In Stock"}
           </span>
         </div>
-      </Link>
+      </button>
 
       <div className="p-5">
         <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
           {categoryName}
         </div>
 
-        <Link to={`/product/${product.id}`}>
+        <button onClick={openProductPage} className="text-left">
           <h3 className="display text-xl font-bold tracking-wide hover:text-primary">
             {product.name}
           </h3>
-        </Link>
+        </button>
 
         <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
           {product.shortDescription}
@@ -64,12 +70,12 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-2">
-          <Link
-            to={`/product/${product.id}`}
+          <button
+            onClick={openProductPage}
             className="inline-flex items-center justify-center gap-1.5 rounded-sm border border-border px-3 py-2.5 text-xs font-bold uppercase tracking-wider hover:border-primary hover:text-primary"
           >
             <Eye className="h-3.5 w-3.5" /> View
-          </Link>
+          </button>
 
           <button
             disabled={outOfStock}
