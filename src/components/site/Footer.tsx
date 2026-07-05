@@ -8,7 +8,11 @@ export function Footer() {
     <footer className="mt-24 border-t border-border bg-card">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div>
-          <img src={LOGO_URL} alt="CRIC NINJA" className="mb-4 h-14 w-14 rounded-full ring-2 ring-primary/40" />
+          <img
+  src={content.branding.logo || LOGO_URL}
+  alt="CRIC NINJA"
+  className="mb-4 h-14 w-14 rounded-full object-cover ring-2 ring-primary/40"
+/>
           <p className="text-sm text-muted-foreground">{content.about.body.slice(0, 140)}...</p>
         </div>
         <div>
