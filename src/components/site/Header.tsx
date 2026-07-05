@@ -21,7 +21,7 @@ export function Header() {
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-3">
           <img
-  src={content.branding.logo || LOGO_URL}
+  src={content.branding?.logo || LOGO_URL}
   alt="CRIC NINJA"
   className="h-12 w-12 rounded-full object-cover ring-2 ring-primary/40"
 />
