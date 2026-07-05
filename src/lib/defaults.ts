@@ -106,6 +106,10 @@ export const DEFAULT_PRODUCTS: Product[] = [
 ];
 
 export const DEFAULT_CONTENT: SiteContent = {
+  branding: {
+    logo: "",
+  },
+
   hero: {
     title: "Strike Like a Ninja.",
     subtitle: "Hand-crafted premium cricket bats engineered for champions.",
