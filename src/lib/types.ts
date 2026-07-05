@@ -20,6 +20,10 @@ export type Product = {
 };
 
 export type SiteContent = {
+  branding: {
+    logo: string;
+  };
+
   hero: {
     title: string;
     subtitle: string;
